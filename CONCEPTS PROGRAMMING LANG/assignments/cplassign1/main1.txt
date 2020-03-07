@@ -1,0 +1,166 @@
+import java.util.EventListener;
+import java.util.Scanner;
+
+public class main 
+{
+      static int DistanceMultiplyer=1;
+      static int VehicleMultiplyer=1;
+      static int TotalFare=0;
+
+     static void Initialize()
+     {  register[] Ruser= new register[5] ;
+         Ruser[0] = new register("aman","9999999999","aman@gmail.com","aman","9999");
+         Ruser[1] = new register("amit","8888999999","amit@gmail.com","aman","8888");
+         Ruser[2] = new register("amar","7777999999","amar@gmail.com","aman","7777");
+         Ruser[3] = new register("raj","66666699999","raj@gmail.com","aman","6666");
+         Ruser[4] = new register("jay","8989999999","jay@gmail.com","aman","8989");
+
+         micro[] MicroCar=new micro[2];
+         micro[] MiniCar=new micro[2];
+         micro[] AutoCar=new micro[2];      
+
+    
+     }
+
+     static void Login()
+     {  int done =0;
+      int choice =0;
+      System.out.println("\n USERNAME:");
+      String USERNAME = ScannerObj.nextLine();
+
+      System.out.println("\n PASSWORD:");
+      String PASSWORD = ScannerObj.nextLine();
+
+      for (int i = 0; i < 5 && done ==0; i++) 
+      {
+       if(USERNAME.equals(Ruser[0].username)&&PASSWORD.equals(Ruser[0].password))
+       {
+         done=1;
+       }
+      }
+
+      while(done!=1)
+      {
+        System.out.println("\n enter valid USERNAME and PASSWORD:\n");
+
+
+        System.out.println("\n USERNAME:");
+       USERNAME = ScannerObj.nextLine();
+
+      System.out.println("\n PASSWORD:");
+      PASSWORD = ScannerObj.nextLine();
+
+      for (int i = 0; i < 5 && done ==0; i++) 
+      {
+       if(USERNAME.equals(Ruser[i].username)&&PASSWORD.equals(Ruser[i].password))
+       {
+         done=1;
+       }
+      }
+      }
+
+     
+      System.out.println("  \n 1) CONTINUE  2)EXIT\n ");
+      System.out.println("\n PLEASE ENTER YOUR CHOICE :");
+      choice = ScannerObj.nextInt();
+      if(choice==1)
+      {
+         path();
+      }
+      else
+      {
+        System.out.println("\n ........THANKS FOR VISITING OUR WEBSITE ....... \n"); 
+        return ;
+      }
+     }
+
+     static void Registration()
+     {    int done =1;
+           int choice =0;
+
+              System.out.println("\n NAME:");
+              String NAME = ScannerObj.nextLine();
+
+              System.out.println("\n MOBNO:");
+              String MOBNO = ScannerObj.nextLine();
+
+              System.out.println("\n EMAIL:");
+              String EMAIL= ScannerObj.nextLine();
+
+              System.out.println("\n  USERNAME:");
+              String USERNAME = ScannerObj.nextLine();
+
+              System.out.println("\n PASSWORD:");
+              String PASSWORD = ScannerObj.nextLine();
+
+
+
+              System.out.println("  \n 1) CONTINUE  2)EXIT\n ");
+              System.out.println("\n PLEASE ENTER YOUR CHOICE :");
+              choice = ScannerObj.nextInt();
+              if(choice==1)
+              {
+                 path();
+              }
+              else
+              {
+                System.out.println("\n ........THANKS FOR VISITING OUR WEBSITE ....... \n"); 
+                return ;
+              }
+
+    
+     }
+
+     static void Path()
+     {
+      ChooseVehicle();
+     }
+
+     static void ChooseVehicle()
+     {
+      CalculateFare();
+     }  
+     
+     static void CalculateFare()
+     {
+    
+     }  
+
+ 
+     public static void main(String[] args)
+     {
+      System.out.println("\n WELCOME TO .....MAHARASHTA.... CAR RENTALS  \n");
+
+      int choice =0;
+      Scanner ScannerObj = new Scanner(System.in);
+
+      System.out.println("  \n 1) LOGIN \n  2)REGISTER \n  3)EXIT \n ");
+      System.out.println("\n PLEASE ENTER YOUR CHOICE :");
+      choice = ScannerObj.nextInt();
+
+      
+
+
+      while(choice!=1&&choice!=2&&choice!=3)
+      {
+        System.out.println("\n PLEASE ENTER --valid-- CHOICE :");
+        choice = ScannerObj.nextInt();
+      }
+     
+      if(choice==1)
+      {
+         Login() ;
+      }
+      elseif(choice==2)
+      {
+         Registration(); 
+      }
+      elseif(choice==3)
+      {
+        System.out.println("\n ........THANKS FOR VISITING OUR WEBSITE ....... \n"); 
+      }
+      
+
+
+     }
+}
