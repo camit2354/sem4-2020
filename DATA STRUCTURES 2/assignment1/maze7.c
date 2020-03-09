@@ -53,7 +53,7 @@ int ValidateMove(int x,int y);
 void InsertPathPQ(PQNode PQptr[],TreeNode * endnode,int index);
 TreeNode *CreateMazeTree(int x, int y,PQNode[],TreeNode *root);
 PQNode *SortPaths(PQNode *PQptr);
-void printOptimumPath(PQNode *PQptr);
+void printOptimumPath(PQNode PQptr[]);
 
 void PrintMaze();
 void PrintPQ(PQNode *PQptr);
@@ -75,19 +75,84 @@ void main()
     PQNode PQptr[NoOfPossiblePaths]; InitializePQ(PQptr);// PrintPQ(PQptr);    
       TreeNode *root=NULL;
        root = CreateMazeTree(starti,startj,PQptr,root); 
-      // PrintMazeTree(root); 
-     PrintPQ(PQptr); 
+      // PrintMazeTree(root);
+      printf("\n\n...............................\n\n");
+       PrintPQ(PQptr);
+      PQNode *SortedPQarr = SortPaths(PQptr) ;
+      PrintPQ(SortedPQarr);
+      printOptimumPath(SortedPQarr);
+       
+    //  printf("\n\n...............................\n\n"); 
     
   return ;
 }
 
 
+void printOptimumPath(PQNode PQptr[])
+{
+   int i=0;
+   while(PQptr[i].root==NULL)
+   {
+       i++;
+   }
+    printf("\n\n***********************************************\n");
+    printf("OPTIMUM-PATH IS ............\n");
+   PrintPath(PQptr[i].root);
+   printf("\n\n***********************************************\n");
+}
+
+
+int CalculateCost(PathNode *root)
+{ int retval =0;
+  while(root!=NULL)
+  {
+     
+      if(Arr[root->x][root->y].boxvar == '@')
+      {
+          
+          retval++;
+      }
+      root =root->next;
+  }
+ 
+  return retval;
+
+}
+
+PQNode *SortPaths(PQNode PQptr[])
+{    printf("\nhi,i am in function sortpaths\n");
+    int i, j,a=0,b=0,sz=NoOfPossiblePaths;
+    PathNode *temp=NULL;
+
+   for (i = 0; i < sz-1; i++)       
+  {
+          
+       for (j = 0; j < sz-i-1; j++)  
+           {  a = CalculateCost(PQptr[j].root);
+              b = CalculateCost(PQptr[j+1].root);
+              
+               if(a>b) 
+               {
+                  temp =PQptr[j].root;
+                  PQptr[j].root=PQptr[j+1].root;
+                  PQptr[j+1].root=temp;
+                  
+
+               }
+              // printf("\tsorted\t");    
+           }
+  }
+      
+  return PQptr;
+
+}
 
 
 TreeNode *CreateMazeTree(int x, int y,PQNode PQptr[],TreeNode *root)
 {  int static count =-1;
 
    TreeNode *newptr = makeTreeNode(x,y,root);
+   char ch =Arr[x][y].boxvar;
   Arr[x][y].boxvar = '1';
 
   if(x==endi && y==endj)
@@ -123,7 +188,7 @@ TreeNode *CreateMazeTree(int x, int y,PQNode PQptr[],TreeNode *root)
 
   }   
   
-   Arr[x][y].boxvar = '0';
+   Arr[x][y].boxvar = ch;
     return newptr;
 
 }
