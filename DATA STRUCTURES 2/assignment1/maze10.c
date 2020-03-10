@@ -70,20 +70,20 @@ int factorial(int num);
 
 void main()
 {
-   InitializeMaze(); PrintMaze();//    SortPaths(PQptr);//    printOptimumPath(PQptr);
+    InitializeMaze();
+    PrintMaze();  //    SortPaths(PQptr);//    printOptimumPath(PQptr);
     
-    PQNode PQptr[NoOfPossiblePaths]; InitializePQ(PQptr);// PrintPQ(PQptr);    
+       PQNode PQptr[NoOfPossiblePaths]; InitializePQ(PQptr);// PrintPQ(PQptr);    
       TreeNode *root=NULL;
-       root = CreateMazeTree(starti,startj,PQptr,root); 
-      // PrintMazeTree(root);
-      printf("\n\n...............................\n\n");
-     //  PrintPQ(PQptr);
-      PQNode *SortedPQarr = SortPaths(PQptr) ;
-
-        PrintPQ(SortedPQarr);
-     
+       root = CreateMazeTree(starti,startj,PQptr,root); // PrintMazeTree(root);
       
-      printOptimumPath(SortedPQarr); 
+      printf("\n\n...............................\n\n"); //  PrintPQ(PQptr);
+    
+      PQNode *SortedPQarr = SortPaths(PQptr) ;
+       printOptimumPath(SortedPQarr);
+        PrintPQ(SortedPQarr);   
+      
+      
     //  printf("\n\n...............................\n\n"); 
     
   return ;
@@ -98,7 +98,7 @@ void printOptimumPath(PQNode PQptr[])
        i++;
    }
     printf("\n\n***********************************************\n");
-    printf("OPTIMUM-PATH IS ............%d \n",i);
+    printf("\n OPTIMUM-PATH IS  with cost =%d \n",CalculateCost(PQptr[i].root));
    PrintPath(PQptr[i].root);
    printf("\n\n***********************************************\n");
 }
