@@ -1,2 +1,0 @@
- SortPaths(PQptr); 
-    //    PrintPQ(PQptr);
