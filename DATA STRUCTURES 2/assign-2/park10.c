@@ -82,7 +82,7 @@ void preOrderFlatInfoTree(flat_info_type *root);
 void map_vehicle_Node();
 void park_vehicle();
 void Remove_vehicle_node ();
- void Display_Visitors();
+void Display_Visitors();
 void  Parking_status ();
 
 
@@ -103,7 +103,7 @@ void main()
   flat_info_tree_ptr = *flat_info_tree_pptr;
   mapped_tree_ptr = *mapped_tree_pptr;
 
- // preOrderMappedTree(mapped_tree_ptr);
+  preOrderMappedTree(mapped_tree_ptr);
   preOrderFlatInfoTree(flat_info_tree_ptr);
   return ;
 }
@@ -113,14 +113,14 @@ void preOrderMappedTree(mapped_tree_node_type *root)
 { 
     if(root != NULL) 
     { 
-        printf("\n vehicle number =%s , key =%d ", root->vehicle_number,root->key); 
+        printf("\n vehicle number =%s\t, key =%d ", root->vehicle_number,root->key); 
         preOrderMappedTree(root->left); 
         preOrderMappedTree(root->right); 
     } 
 } 
 
 void preOrderFlatInfoTree(flat_info_type *root)
-{  printf("\n i am in function preOrderFlatInfoTree\n");
+{ // printf("\n i am in function preOrderFlatInfoTree\n");
     if(root != NULL) 
     { 
         printf(" \n wing id=%d, flat id =%d key =%d", root->wing_id,root->flat_id,root->key); 
@@ -133,30 +133,124 @@ void preOrderFlatInfoTree(flat_info_type *root)
 /*   ................... create_flat_info_tree..................*/
 
 flat_info_type *create_flat_info_tree(available_map_space_type **map_space_pptr,mapped_tree_node_type **mapped_tree_pptr, flat_info_type **flat_info_tree_pptr)
-{  printf("\n i am in function create_flat_info_tree \n");
-   mapped_tree_node_type **mapped_tree_pptr_dummy;
-   flat_info_type **flat_info_tree_pptr_dummy;
-   available_map_space_type **map_space_pptr_dummy;
+{ // printf("\n i am in function create_flat_info_tree \n");
+    
+     int wing_id;
+    int flat_id; 
+     int  no_of_two_wheelers;
+     int no_of_four_wheelers;      
+    char vehicle_number[max_vehicle][9];
+    
 
-   mapped_tree_pptr_dummy =mapped_tree_pptr;
-   flat_info_tree_pptr_dummy =flat_info_tree_pptr;
-   map_space_pptr_dummy = map_space_pptr;
-
-    for(int i=0;i<2;i++)
+    FILE *fp;
+    fp = fopen("flatinfo.txt","r");
+     
+  
+    if(fp == NULL)
     {
-       add_flat_info(map_space_pptr_dummy,mapped_tree_pptr_dummy,flat_info_tree_pptr_dummy);
-       *mapped_tree_pptr = *mapped_tree_pptr_dummy;
-       *flat_info_tree_pptr = *flat_info_tree_pptr_dummy;
-        *map_space_pptr_dummy = *map_space_pptr;
-
+        printf("Error opening file\n");
+        exit(1);
     }
+while(fscanf(fp, "%d\t%d\t%d\t%d\t%s\t%s",&wing_id,&flat_id,&no_of_two_wheelers,&no_of_four_wheelers,vehicle_number[0],vehicle_number[1])!=EOF  )
+{   flat_info_type *newNode =(flat_info_type *)malloc(sizeof(flat_info_type));
+    newNode->wing_id = wing_id;
+    newNode->flat_id = flat_id;
+    newNode->no_of_two_wheelers = no_of_two_wheelers;
+    newNode->no_of_four_wheelers = no_of_four_wheelers;
+    strcpy(newNode->vehicle_number[0],vehicle_number[0]); printf("\n vehicle number 1=%s \t vehicle number 2=%s",vehicle_number[0],vehicle_number[1]);
+    strcpy(newNode->vehicle_number[1],vehicle_number[1]);
+     newNode->total_no_of_vehicles = newNode->no_of_four_wheelers + newNode->no_of_two_wheelers;
+    newNode->key = newNode->wing_id*100 + newNode->flat_id;
+    
+    
+    
+     /*   code  of  function add flat info */ 
+         int i,j;
+         int dedicated_parking_wing;
+           
+               flat_info_type *flat_info_tree_ptr = *flat_info_tree_pptr;
+          *flat_info_tree_pptr = insert_flat_info_tree(*flat_info_tree_pptr , newNode);
+
+   for( i=0;i<newNode->no_of_two_wheelers;i++)
+   {   
+
+       if((*map_space_pptr)->compact_space[newNode->wing_id -1] <36)
+       {
+                dedicated_parking_wing = newNode->wing_id;
+                mapped_tree_node_type *newMappedTreeNode = new_mapped_tree_node(newNode->wing_id,dedicated_parking_wing,newNode->flat_id,2,(*map_space_pptr)->compact_space[dedicated_parking_wing-1],newNode->vehicle_number[i]);
+                (*map_space_pptr)->compact_space[dedicated_parking_wing-1] = (*map_space_pptr)->compact_space[dedicated_parking_wing-1] +1;
+               *mapped_tree_pptr = insert_mapped_tree(*mapped_tree_pptr , newMappedTreeNode);
+
+      
+       }
+       else if ((*map_space_pptr)->compact_space[(newNode->wing_id)%3] <36)
+       {
+
+                dedicated_parking_wing = (newNode->wing_id)%3 +1;
+                mapped_tree_node_type *newMappedTreeNode = new_mapped_tree_node(newNode->wing_id,dedicated_parking_wing,newNode->flat_id,2,(*map_space_pptr)->compact_space[dedicated_parking_wing-1],newNode->vehicle_number[i]);
+                (*map_space_pptr)->compact_space[dedicated_parking_wing-1] = (*map_space_pptr)->compact_space[dedicated_parking_wing-1] +1;
+                  *mapped_tree_pptr = insert_mapped_tree(*mapped_tree_pptr , newMappedTreeNode);
+
+       }
+       else if ((*map_space_pptr)->compact_space[(newNode->wing_id +1)%3] <36)
+       {
+
+           dedicated_parking_wing = (newNode->wing_id +1 )%3 +1;
+           mapped_tree_node_type *newMappedTreeNode = new_mapped_tree_node(newNode->wing_id,dedicated_parking_wing,newNode->flat_id,2,(*map_space_pptr)->compact_space[dedicated_parking_wing-1],newNode->vehicle_number[i]);
+            (*map_space_pptr)->compact_space[dedicated_parking_wing-1] = (*map_space_pptr)->compact_space[dedicated_parking_wing-1] +1;
+               *mapped_tree_pptr = insert_mapped_tree(*mapped_tree_pptr , newMappedTreeNode);
+
+       }
+       else
+       {
+
+           printf("\n space is not available for parking \n");
+          // return NULL;
+
+       }
+       
+       
+      // return newMappedTreeNode ;
+       
+   }
+
+  for( j=0;j<newNode->no_of_four_wheelers;j++)
+  {   if(j==0)
+      {
+          dedicated_parking_wing = newNode->wing_id ;
+           mapped_tree_node_type *newMappedTreeNode = new_mapped_tree_node(newNode->wing_id,dedicated_parking_wing,newNode->flat_id,2,(*map_space_pptr)->compact_space[dedicated_parking_wing-1],newNode->vehicle_number[i]);
+           (*map_space_pptr)->compact_space[dedicated_parking_wing-1] = (*map_space_pptr)->compact_space[dedicated_parking_wing-1] +1;
+           *mapped_tree_pptr = insert_mapped_tree(*mapped_tree_pptr , newMappedTreeNode);
+
+      }
+
+      if(j==1)
+      {
+           dedicated_parking_wing = (newNode->wing_id )%3 +1 ;
+            mapped_tree_node_type *newMappedTreeNode = new_mapped_tree_node(newNode->wing_id,dedicated_parking_wing,newNode->flat_id,2,(*map_space_pptr)->compact_space[dedicated_parking_wing-1],newNode->vehicle_number[i]);
+             (*map_space_pptr)->compact_space[dedicated_parking_wing-1] = (*map_space_pptr)->compact_space[dedicated_parking_wing-1] +1;
+              *mapped_tree_pptr = insert_mapped_tree(*mapped_tree_pptr , newMappedTreeNode);  
+      
+      }
+
+     if(j>=2)
+     {
+         printf("\n this vehicle not added in mapped tree since max 2 four wheelers can be added, this vehicle will work as guest vehicle\n");
+     }
+  
+  }
+
+ } 
+
+  fclose(fp);
+    
 
 
 }
 
 /*   ................... */
 flat_info_type *add_flat_info(available_map_space_type **map_space_pptr,mapped_tree_node_type **mapped_tree_pptr, flat_info_type **flat_info_tree_pptr)
-{  printf("\n i am in function add_flat_info \n");
+{ // printf("\n i am in function add_flat_info \n");
     int i,j;
    int dedicated_parking_wing;
    // mapped_tree_node_type *mapped_tree_ptr = *mapped_tree_pptr;
@@ -239,7 +333,7 @@ flat_info_type *add_flat_info(available_map_space_type **map_space_pptr,mapped_t
 
 /*   ................... */
 flat_info_type *new_flat_info_node()
-{     printf("\n i am in function new_flat_info_node \n");
+{    // printf("\n i am in function new_flat_info_node \n");
 
     flat_info_type *newNode =(flat_info_type *)malloc(sizeof(flat_info_type));
 
@@ -267,14 +361,14 @@ flat_info_type *new_flat_info_node()
     newNode->left = NULL;
     newNode->right = NULL;
 
-printf(" i am out of function new_flat_info_node");
+    // printf(" i am out of function new_flat_info_node");
     return newNode;
 
 }
 
 /*   ................... */
 available_map_space_type *new_available_map_space()
-{   printf("\n i am in function new_available_map_space \n");  
+{  // printf("\n i am in function new_available_map_space \n");  
 
     available_map_space_type *newNode = (available_map_space_type *)malloc(sizeof(available_map_space_type));
     newNode->compact_space[0] = 0;
@@ -292,7 +386,7 @@ available_map_space_type *new_available_map_space()
 /*   ................... */
 mapped_tree_node_type  *new_mapped_tree_node(int wing_id,int dedicated_parking_wing ,int flat_id,int vehicle_type ,int index,char vehicleArr[])
 {
-     printf("\n i am in function new_flat_info_node \n");
+   //  printf("\n i am in function new_flat_info_node \n");
 
     mapped_tree_node_type  *newNode = (mapped_tree_node_type  *)malloc(sizeof(mapped_tree_node_type));
     newNode->wing_id = wing_id;
@@ -324,7 +418,7 @@ mapped_tree_node_type  *new_mapped_tree_node(int wing_id,int dedicated_parking_w
 /*   ...................max.................. */
 int max(int a, int b) 
 { 
-    printf("\n i am in function max\n");
+  //  printf("\n i am in function max\n");
 
     return (a > b)? a : b; 
 } 
@@ -332,7 +426,7 @@ int max(int a, int b)
 /*   ...................height_mapped_tree..................... */
 int height_mapped_tree(mapped_tree_node_type *nodeptr) 
 { 
-    printf("\n i am in function height_mapped_tree \n");
+   // printf("\n i am in function height_mapped_tree \n");
 
     if (nodeptr == NULL) 
         return 0; 
@@ -341,7 +435,7 @@ int height_mapped_tree(mapped_tree_node_type *nodeptr)
 
 /*   ................... height_file_info_tree.............. */
 int height_file_info_tree(flat_info_type *nodeptr) 
-{ printf("\n i am in function height_file_info_tree \n");
+{ // printf("\n i am in function height_file_info_tree \n");
 
     if (nodeptr == NULL) 
         return 0; 
@@ -350,7 +444,7 @@ int height_file_info_tree(flat_info_type *nodeptr)
 
 /*   ...................rightRotate_mapped_tree.................... */
 mapped_tree_node_type *rightRotate_mapped_tree(mapped_tree_node_type *y) 
-{ printf("\n i am in function rightRotate_mapped_tree \n");
+{  // printf("\n i am in function rightRotate_mapped_tree \n");
 
     mapped_tree_node_type *x = y->left; 
     mapped_tree_node_type *T2 = x->right; 
@@ -371,7 +465,7 @@ mapped_tree_node_type *rightRotate_mapped_tree(mapped_tree_node_type *y)
 /*   ...................leftRotate_mapped_tree...................... */
 mapped_tree_node_type *leftRotate_mapped_tree(mapped_tree_node_type *x) 
 { 
-    printf("\n i am in function leftRotate_mapped_tree \n");
+   // printf("\n i am in function leftRotate_mapped_tree \n");
 
     mapped_tree_node_type *y = x->right; 
     mapped_tree_node_type *T2 = y->left; 
@@ -390,7 +484,7 @@ mapped_tree_node_type *leftRotate_mapped_tree(mapped_tree_node_type *x)
   
   /*   ...................getBalance_mapped_tree..................... */
 int getBalance_mapped_tree(mapped_tree_node_type *N) 
-{ printf("\n i am in function getBalance_mapped_tree \n");
+{ // printf("\n i am in function getBalance_mapped_tree \n");
     if (N == NULL) 
         return 0; 
     return height_mapped_tree(N->left) - height_mapped_tree(N->right); 
@@ -398,7 +492,7 @@ int getBalance_mapped_tree(mapped_tree_node_type *N)
 
 /*   ...................rightRotate_flat_info_tree.............. */
 flat_info_type *rightRotate_flat_info_tree(flat_info_type *y) 
-{ printf("\n i am in function rightRotate_flat_info_tree \n");
+{  // printf("\n i am in function rightRotate_flat_info_tree \n");
 
     flat_info_type *x = y->left; 
     flat_info_type *T2 = x->right; 
@@ -418,7 +512,7 @@ flat_info_type *rightRotate_flat_info_tree(flat_info_type *y)
 /*   ................... leftRotate_flat_info_tree..................................*/ 
 flat_info_type *leftRotate_flat_info_tree(flat_info_type *x) 
 { 
-    printf("\n i am in function leftRotate_flat_info_tree \n");
+   // printf("\n i am in function leftRotate_flat_info_tree \n");
 
     flat_info_type *y = x->right; 
     flat_info_type *T2 = y->left; 
@@ -437,7 +531,7 @@ flat_info_type *leftRotate_flat_info_tree(flat_info_type *x)
   
 /*   ...................  getBalance_flat_info_tree.................................*/
 int getBalance_flat_info_tree(flat_info_type *N) 
-{ printf("\n i am in function getBalance_flat_info_tree \n");
+{  // printf("\n i am in function getBalance_flat_info_tree \n");
 
     if (N == NULL) 
         return 0; 
@@ -446,7 +540,7 @@ int getBalance_flat_info_tree(flat_info_type *N)
 
 /*   ...................insert_mapped_tree ..................................*/
 mapped_tree_node_type *insert_mapped_tree(mapped_tree_node_type * node,mapped_tree_node_type *newNode) 
-{ printf("\n i am in function insert_mapped_tree \n");
+{  // printf("\n i am in function insert_mapped_tree \n");
 
     int key = newNode->key;
 
@@ -501,7 +595,7 @@ mapped_tree_node_type *insert_mapped_tree(mapped_tree_node_type * node,mapped_tr
 
 /*   ................... insert_flat_info_tree ......................................*/
 flat_info_type *insert_flat_info_tree(flat_info_type * node,flat_info_type * newNode) 
-{   printf("\n i am in function insert_flat_info_tree\n");
+{  //  printf("\n i am in function insert_flat_info_tree\n");
 
     int key = newNode->key;
     /* 1.  Perform the normal BST insertion */
