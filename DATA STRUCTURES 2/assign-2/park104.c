@@ -180,7 +180,7 @@ void main()
    preOrderMappedTree(mapped_tree_ptr);
     preOrderFlatInfoTree(*flat_info_tree_pptr);
 
-  // initialize_parking_db_day_tree(mapped_tree_ptr,parking_lot_status_pptr,parking_db_day_tree_pptr);
+   initialize_parking_db_day_tree(mapped_tree_ptr,parking_lot_status_pptr,parking_db_day_tree_pptr);
 
   
   return ;
@@ -457,7 +457,7 @@ void initialize_parking_db_day_tree(mapped_tree_node_type *mapped_tree_ptr,parki
     FILE *fp;
     fp = fopen("parking_db.txt","r");
 
-    int *vehicle_type_ptr;
+    
     int vehicle_type;
     int dedicated_index;
     int dedicated_wing;
@@ -471,6 +471,7 @@ void initialize_parking_db_day_tree(mapped_tree_node_type *mapped_tree_ptr,parki
         
         parking_db_day_type *dayNode = NULL;
         printf("%d %s %s %s \n",vehicle_type,intime,indate,vehicle_number);
+
         
         int key =(indate[4]-'0')*100000+(indate[5]-'0')*10000+(indate[2]-'0')*1000+(indate[3]-'0')*100+(indate[0]-'0')*10+(indate[1]-'0')*1;
         dayNode = search_parking_db_day_tree(*parking_db_day_tree_pptr,key);
@@ -479,9 +480,25 @@ void initialize_parking_db_day_tree(mapped_tree_node_type *mapped_tree_ptr,parki
             
 
             parked_vehicle_type *newParkedVehicleNode = ( parked_vehicle_type *)malloc(sizeof(parked_vehicle_type));
-            strcpy(newParkedVehicleNode->intime,intime);
-            strcpy(newParkedVehicleNode->indate,indate) ;
-            strcpy(newParkedVehicleNode->vehicle_number,vehicle_number);
+           
+           // strcpy(newParkedVehicleNode->intime,intime);
+            for(int i=0;i<4;i++)
+            {
+               newParkedVehicleNode->intime[i] = intime[i] ;
+            }
+           // strcpy(newParkedVehicleNode->indate,indate);
+            for(int i=0;i<6;i++)
+            {
+               newParkedVehicleNode->indate[i] = indate[i] ;
+            }
+
+          //  strcpy(newParkedVehicleNode->vehicle_number,vehicle_number);
+            for(int i=0;i<9;i++)
+            {
+               newParkedVehicleNode->vehicle_number[i] = vehicle_number[i] ;
+            }
+
+            printf("%s %s %s \n",newParkedVehicleNode->intime,newParkedVehicleNode->indate,newParkedVehicleNode->vehicle_number);
                   dedicated_wing = get_dedicated_wing_for_new_parked_vehicle(vehicle_type,vehicle_number,mapped_tree_ptr,parking_lot_status_pptr);
                   newParkedVehicleNode->dedicated_parking_wing_id = dedicated_wing;
                   dedicated_index = get_dedicated_index_for_new_parked_vehicle(vehicle_type,vehicle_number,mapped_tree_ptr,parking_lot_status_pptr);
@@ -509,7 +526,7 @@ void initialize_parking_db_day_tree(mapped_tree_node_type *mapped_tree_ptr,parki
             newDayNode->parked_vehicles_arr[newDayNode->top]=newParkedVehicleNode;
             newDayNode->top +=1;
 
-           *parking_db_day_tree_pptr = insert_parking_db_day_tree(*parking_db_day_tree_pptr,newDayNode);
+         //  *parking_db_day_tree_pptr = insert_parking_db_day_tree(*parking_db_day_tree_pptr,newDayNode);
            
         }
         else
@@ -1019,8 +1036,16 @@ while(fscanf(fp, "%d\t%d\t%d\t%d\t%s\t%s",&wing_id,&flat_id,&no_of_two_wheelers,
     newNode->flat_id = flat_id;
     newNode->no_of_two_wheelers = no_of_two_wheelers;
     newNode->no_of_four_wheelers = no_of_four_wheelers;
-    strcpy(newNode->vehicle_number[0],vehicle_number[0]); 
-    strcpy(newNode->vehicle_number[1],vehicle_number[1]);
+    // strcpy(newNode->vehicle_number[0],vehicle_number[0]); 
+    for(int i =0;i<9;i++)
+    {
+        newNode->vehicle_number[0][i] = vehicle_number[0][i] ;
+    }
+   //  strcpy(newNode->vehicle_number[1],vehicle_number[1]);
+   for(int i =0;i<9;i++)
+    {
+        newNode->vehicle_number[1][i] = vehicle_number[1][i];
+    }
      newNode->total_no_of_vehicles = newNode->no_of_four_wheelers + newNode->no_of_two_wheelers;
     newNode->key = newNode->wing_id*100 + newNode->flat_id;
     
