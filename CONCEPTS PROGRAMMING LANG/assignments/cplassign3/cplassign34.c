@@ -45,8 +45,10 @@ node* insert(node *root, int x)
         return new_node(x);
     else if(x>root->data) // x is greater. Should be inserted to right
         root->right = insert(root->right, x);
-    else // x is smaller should be inserted to left
+    else if(x<root->data)// x is smaller should be inserted to left
         root->left = insert(root->left,x);
+       
+        
     return root;
 }
 
@@ -75,42 +77,35 @@ void mark(node *root)
       
      while(marker->curr!=NULL)
      {
-         if(marker->prev != NULL)
-         printf("\n before ===)   prev->data :%d  curr->data %d",marker->prev->data,marker->curr->data);
-        else
-        { printf("\n before ===)   prev->data :NULL  curr->data %d",marker->curr->data);
-        }
+        //  if(marker->prev != NULL)
+        //  printf("\n before ===)   prev->data :%d  curr->data %d",marker->prev->data,marker->curr->data);
+        // else
+        // { printf("\n before ===)   prev->data :NULL  curr->data %d",marker->curr->data);
+        // }
         
        
         node *ptr = marker->curr;
 
         if(ptr->mark == 1)
         {
-            if((marker->prev)->data > (marker->curr)->data)
+            if((marker->prev)->data < (marker->curr)->data)
             {
                  if(marker->curr->right == NULL)
                  {
-                    node *temp;
-                    temp = marker->curr->left;
-                    marker->curr->left = marker->prev;
+                    node *temp = marker->prev;
                     marker->prev = marker->curr;
-                    marker->curr =temp; 
-
+                    marker->curr = marker->curr->left;
+                    marker->prev->left = temp;
                     
-
                  }
                  else
                  {
-                      node *temp1,*temp2;
-                      temp1 = marker->prev;
-                      temp2 = marker->curr->left;
-                       marker->curr = marker->curr->right;
-                      marker->curr->right = temp2;
-                      marker->curr->left = temp1;
-                      marker->prev = temp1;
+                      node *temp1 = marker->prev;
+                      marker->prev = marker->curr;
+                      marker->curr = marker->curr->right;
+                      marker->prev->right = marker->prev->left;
+                      marker->prev->left = temp1;
 
-
-                     
                  }
                                 
 
@@ -118,11 +113,10 @@ void mark(node *root)
             else
             {
                 
-                    node *temp;
-                    temp = marker->prev;
+                    node *temp = marker->prev;
                      marker->prev = marker->curr;
-                     marker->curr->left = temp;
-                    marker->curr = marker->curr->right;                  
+                     marker->curr = marker->curr->right;
+                    marker->prev->right = temp;                  
                     
 
             }
@@ -136,10 +130,9 @@ void mark(node *root)
             {
                                         
                     (marker->curr)->mark =1;
-                    node *temp;
-                    temp = marker->curr;
+                    node *temp = marker->curr;
                     marker->curr = marker->curr->left;
-                   temp->left= marker->prev;
+                    temp->left= marker->prev;
                     marker->prev =temp;           
             
             
@@ -179,39 +172,35 @@ void mark(node *root)
                 else
                 {
 
-                        if(marker->prev->data > marker->curr->data)
+                        if(marker->prev->data < marker->curr->data)
                         {
-                            if((marker->prev)->right == NULL)
-                            {
-                                (marker->curr)->mark =1;
-                                node *temp;
-                                temp = marker->curr;
-                                marker->curr = (marker->prev)->left;
-                                (marker->prev)->left = temp;
-                            }
-                            else
-                            {
-                                (marker->curr)->mark =1;
-                                node *temp1,*temp2;
-                                temp1 = marker->prev->left;
-                                temp2 = marker->curr;
-                                marker->curr = (marker->prev)->right;
-                                marker->prev->left =temp2;
-                                marker->prev->right = temp1;
-                                
-                                                            
-                                
-                            }
-                            
+                            (marker->curr)->mark = 1;
+                            node *temp = marker->curr;
+                            marker->curr = marker->prev->right;
+                            marker->prev->right = temp;
+                           
 
                         }
                         else
                         {
+                            if(marker->prev->right == NULL)
+                            {
                                 (marker->curr)->mark = 1;
-                                node *temp;
-                                temp = (marker->curr);
-                                (marker->curr) = (marker->prev)->right;
-                                (marker->prev)->right = temp;
+                                node *temp = marker->curr;
+                                marker->curr = marker->prev->left;
+                                marker->prev->left = temp;
+
+                            }
+                            else
+                            {
+                                (marker->curr)->mark = 1;
+                                node *temp = marker->curr;
+                                marker->curr = marker->prev->right;
+                                marker->prev->right = marker->prev->left;
+                                marker->prev->left = temp;
+
+                                
+                            }
 
                         }
 
@@ -226,23 +215,21 @@ void mark(node *root)
         
      }
 
-       printf("\n root data : %d ,root->left :%p root->right :%p \n ", root->data,root->left,root->right);
-       printf("\n left data : %d ,left->left :%p left->right:%p\n ", root->left->data,root->left->left,root->left->right);
-       printf("\n right data : %d ,right->left%p : right->right :%p\n ", root->right->data,root->right->left,root->right->right);
-       printf("\n left left data : %d ,left left ->left:%p left left ->right:%p \n ", (root->left)->left->data,(root->left)->left->left,(root->left)->left->right);
-
-
-        preorder(root->right);   
-       printf("\n");
-     
-           
-        
-
-     
-
+      
+    //     preorder(root->right);   
+    //    printf("\n");
+    
 
 }
 
+void printleft(node *root)
+{
+    while(root != NULL)
+    {
+        printf("\n[ %d ]\n",root->data);
+        root = root->right;
+    }
+}
 
 
 int main()
@@ -250,22 +237,26 @@ int main()
    
      node *root;
     root = new_node(50);
-    insert(root,40);
-    insert(root,60);
-    insert(root,30);
-    // insert(root,20);
-    // insert(root,10);
-    // insert(root,55);
-    // insert(root,65);
-    // insert(root,45);
-    // insert(root,35);
-    // insert(root,70);
-    // insert(root, 75);
-    // insert(root, 25);
+     insert(root,40);
+     insert(root,60);
+     insert(root,30);
+     insert(root,45);
+    insert(root,20);
+    insert(root,10);
+    insert(root,55);
+    insert(root,65);
+    insert(root,45);
+    insert(root,35);
+    insert(root,70);
+    insert(root, 75);
+    insert(root, 25);
 
    mark(root);
-    // preorder(root);   
-    //    printf("\n");
+   preorder(root);
+//     node *ptr =root->right;
+//   printf("\n data : %d left data : %d right data : %d\n",ptr->data,ptr->left,ptr->right);
+     
+        printf("\n");
 
     return 0;
 }

@@ -224,6 +224,9 @@ void mark(node *root)
         
      }
 
+      preorder(root);   
+       printf("\n");
+
 }
 
 
