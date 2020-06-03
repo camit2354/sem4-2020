@@ -4,10 +4,19 @@
 
 typedef enum {FALSE =0 ,TRUE =1 }boolean;
 typedef enum{success =1 ,failure =0}status;
+#define INF 1000
 
-#define QueueSize 100
 typedef struct EdgeNodeTag
-{    char graphNodeName; 
+{   
+     struct VertexNode 
+    {
+        char graphNodeName;
+        int mark;  //  0 = unmarked , 1 = marked      
+        struct VertexNodeTag *down;
+        struct EdgeNodeTag *right;
+    }*startVertex,*endVertex;
+
+     char graphNodeName; 
     struct EdgeNodeTag *right;
     int weight;
 
@@ -31,25 +40,9 @@ typedef struct graphTag
 }graph;
 
 
-typedef struct QueueTag
-{
-    char Arr[QueueSize];
-    int front;
-    int rear;
-    boolean isfull;
-}Queue;
-
-//**********************************************************
-Queue *initializeQueue();
-status push(Queue *,char );
-char pop(Queue *);
-boolean isEmpty(Queue *);
-boolean isFull(Queue *);
-void printQueue(Queue *);
-//**********************************************************
 
 
-//**********************************************************
+void simplyDisplay(graph *);
 graph *initializeGraph();
 
 graph *addVertex(graph *, char nodeName);
@@ -58,23 +51,8 @@ graph *deleteVertex(graph * , char nodeName);
 graph *addEdge(graph *, char startNodeName ,char endNodeName ,int weight);
 graph *deleteEdge(graph *, char startNodeName ,char endNodeName);
 
-//***********************************************************
+graph *CreateMST(graph *);
 
-
-
-//***********************************************************
-void simplyDisplay(graph *);
-void displayDepthFirst(graph *graphPtr , char startPoint);
-void displayBreadthFirst(graph *graphPtr , Queue *qptr);
-void displayTopoSort();
-//***********************************************************
-
-//****************************************************************
-#define INF 1000
-void dijkstra(int no_of_vertex,int grapharr[][no_of_vertex]);
-boolean isAllFound(int no_of_vertex,int arr[no_of_vertex]);
-int selMin(int no_of_vertex,int found[],int dist[]);
-//****************************************************************
 
 boolean isPathExists(graph * ,char , char );
 boolean isDisConnected(graph *);
@@ -89,8 +67,40 @@ void markedNodes(graph *);
 
 void main()
 {
-     int Arr[5][5] ={{0,2,5,INF,3},{INF,0,6,4,10},{INF,INF,0,INF,2},{INF,INF,INF,0,INF},{INF,INF,1,2,0}};
-     dijkstra(5,Arr);
+      graph *graphPtr = initializeGraph();
+      simplyDisplay(graphPtr);
+     // CreateMST(graphPtr);
+
+    //   graph *graphPtr = initializeGraph();
+    //   simplyDisplay(graphPtr);
+    //   DepthFirstSearch(graphPtr,'A','D');
+
+
+    //  graph *graphPtr = initializeGraph();
+    // simplyDisplay(graphPtr);
+    // BreadthFirstSearch(graphPtr,'C','A');
+
+    //  int Arr2[3][3] = {{0,4,11},{6,0,2},{3,INF,0}};
+    //  apsp(3,Arr2);
+
+    
+
+    //  int Arr[5][5] ={{0,2,5,INF,3},
+    //                 {INF,0,6,4,10},
+    //                 {INF,INF,0,INF,2},
+    //                 {INF,INF,INF,0,INF},
+    //                 {INF,INF,1,2,0}};
+
+    //  dijkstra(5,Arr);
+    //  printf("\n\n\n");
+    //  int Arr1[6][6] = {{0,50,45,20,INF,INF},
+    //                     {INF,0,10,15,INF,INF},
+    //                     {INF,INF,0,INF,30,INF},
+    //                     {10,INF,INF,0,15,INF},
+    //                     {INF,20,35,INF,0,INF},
+    //                     {INF,INF,INF,INF,23,0}};
+
+    //   dijkstra(6,Arr1);              
 
     // graph *graphPtr = initializeGraph();
     // simplyDisplay(graphPtr);
@@ -122,90 +132,40 @@ void main()
     // simplyDisplay(graphPtr);
 }
 
-void dijkstra(int no_of_vertex,int grapharr[][no_of_vertex])
+//**************minimum spanning tree :  Calculate and display  ********************
+graph *CreateMST(graph *gp)
 {
-    for(int i=0;i<no_of_vertex;i++)
-    {   printf(" %d : ",i); 
-        for(int j=0;j<no_of_vertex;j++)
-        {
-            printf(" [ %d ] ",grapharr[i][j]);
-        }
-         printf("\n");
-    }
-
-    int found[no_of_vertex];
-    for(int i=0;i<no_of_vertex;i++)
-    {
-        found[i] = 0;
-    }
-
-    int dist[no_of_vertex];
-    for(int i=0;i<no_of_vertex;i++)
-    {
-        dist[i] = grapharr[0][i];
-    }
-    found[0] = 1;
-
-    while(isAllFound(no_of_vertex,found) == FALSE)
-    {
-        int minindex = selMin(no_of_vertex,found,dist);
-        found[minindex] = 1;
-
-        for(int i=0;i<no_of_vertex;i++)
-        {
-            if(found[i] == 0)
-            {
-                if(dist[minindex] + grapharr[minindex][i]<dist[i])
-                {
-                    dist[i] = dist[minindex] + grapharr[minindex][i];
-                }
-            }
-        }
-
-         printf("\n found index : %d  \n dist array :",minindex);
-         for(int i=0;i<no_of_vertex;i++)
-         {
-           printf("[ %d ]",dist[i]);
-         }
-         printf("\n");
-   
-
-    }
-
-    
-    
+    graph *gp1 = gp;
+    simplyDisplay(gp1);
+  
 }
 
-boolean isAllFound(int no_of_vertex,int arr[no_of_vertex])
-{ boolean retval = TRUE;
-   for(int i=0;i<no_of_vertex;i++)
-   {
-       if(arr[i] == 0)
-       retval = FALSE;
-   }
-
-   return retval;
-
-}
-
-int selMin(int no_of_vertex,int found[],int dist[])
+EdgeNode *LowestWeightEdge(graph *gp)
 {
-    int minindex = -1;
-    int min = 1000;
-
-    for(int i=0;i<no_of_vertex;i++)
+    EdgeNode *retedge = NULL;
+    VertexNode *vptr = gp->VertexListRoot;
+    EdgeNode *egptr = vptr->right;
+    retedge = egptr;
+    while(vptr != NULL)
     {
-        if(dist[i] < min && found[i] == 0)
-        {
-            min = dist[i];
-            minindex = i;
+        egptr = vptr->right;
+        while(egptr != NULL)
+        {  if(retedge->weight > egptr->weight )
+           {
+             retedge = egptr;
+           }
+            egptr = egptr->right;
         }
+        vptr = vptr->down;
     }
 
-    return minindex;
-
-
+    return retedge;
 }
+//*************************************************************************************
+
+//**************************************************************************
+//*********************** mark functions ***********************************
+
 void markedNodes(graph *gp)
 {
     VertexNode *vptr = gp->VertexListRoot;
@@ -222,6 +182,7 @@ void markedNodes(graph *gp)
             printf("\n\n");
 
 }
+
 void markVertex(graph *graphPtr,char ele )
 {
   VertexNode *vptr = graphPtr->VertexListRoot;
@@ -292,54 +253,12 @@ boolean isAllMarked(graph *graphPtr,char ele)
     return retval;
 
 }
-
-void displayBreadthFirst(graph *graphPtr , Queue *qptr)
-{
-    char printChar = pop(qptr);
-
-
-    if(printChar != '\0')
-    {
-        printf("[ %c ] ",printChar);
-             VertexNode *vptr = graphPtr->VertexListRoot;
-               while(vptr->graphNodeName != printChar)
-               {
-                   vptr = vptr->down;
-               }
-                    EdgeNode *egptr = vptr->right;
-                    while(egptr != NULL)
-                    {
-                       
-                          if(isMarked(graphPtr,egptr->graphNodeName) == 0)
-                          {
-                              push(qptr,egptr->graphNodeName);
-                              markVertex(graphPtr,egptr->graphNodeName);
-                            //  printf(" [ %c ] ",egptr->graphNodeName);
-
-                          }
-
-                          egptr =egptr->right;
-                        
-                    }
-                    
-                   // markVertex(graphPtr,printChar);
-                   // markedNodes(graphPtr);
-                   // printf("\n");
-                  // printQueue(qptr);
-                  displayBreadthFirst(graphPtr,qptr);
-     }
-     else
-     {
-         return ;
-     }
-     
-   
-   
-
-}
+//********************************************************************************
 
 
 
+//*******************************************************************************
+//************ graph standard functions ****************************************
 
 graph *initializeGraph()
 {
@@ -355,22 +274,29 @@ graph *initializeGraph()
     // scanf("%d",&N);
 
        simplyDisplay(graphPtr);
-    int Arr[5][5] ={{0,2,5,1000,3},{0,0,6,4,10},{0,0,0,0,2},{0,0,0,0,0},{0,0,1,2,0}};
-    for(int i=0;i<5;i++)
+   // int Arr[5][5] ={{0,2,5,1000,3},{0,0,6,4,10},{0,0,0,0,2},{0,0,0,0,0},{0,0,1,2,0}};
+    int Arr[7][7] = {{0,28,INF,INF,INF,10,INF},
+                        {28,0,16,INF,INF,INF,14},
+                        {INF,16,0,12,INF,INF,INF},
+                        {INF,INF,12,0,22,INF,18},
+                        {INF,INF,INF,22,0,25,24},
+                        {INF,INF,INF,INF,25,0,INF},
+                        {INF,14,INF,18,24,INF,0}};
+    for(int i=0;i<7;i++)
     {
         VertexNode *newVertexNode =(VertexNode *)malloc(sizeof(VertexNode));
-        newVertexNode->graphNodeName ='A' + i;
+        newVertexNode->graphNodeName ='0' + i;
         newVertexNode->mark = 0;
         newVertexNode->down = NULL;
         newVertexNode->right =NULL;
         
 
-        for(int j=0;j<5;j++)
+        for(int j=0;j<7;j++)
         {
             if(Arr[i][j] < 1000 && Arr[i][j] != 0)
             {
                 EdgeNode *newEdgeNode = (EdgeNode *)malloc(sizeof(EdgeNode));
-                newEdgeNode->graphNodeName = 'A' +j;
+                newEdgeNode->graphNodeName = '0' +j;
                 newEdgeNode->weight = Arr[i][j];
                 newEdgeNode->right =NULL;
                 newVertexNode->right = insertEdgeNode(newVertexNode->right,newEdgeNode);
@@ -383,7 +309,6 @@ graph *initializeGraph()
        
     }
 }
-
 
 VertexNode *insertVertexNode(VertexNode *root,VertexNode *newNode)
 {
@@ -440,10 +365,10 @@ void simplyDisplay(graph *graphPtr)
         while(ptr1 != NULL)
         {
             ptr2 = ptr1->right;
-            printf("\n [ %c ]",ptr1->graphNodeName);
+            printf("\n [ %c ] : ",ptr1->graphNodeName);
             while(ptr2 != NULL)
             {
-                printf(" ( %c )",ptr2->graphNodeName);
+                printf(" ( %c ) : start :%c end :%c \t",ptr2->graphNodeName,ptr2->startVertex->graphNodeName,ptr2->endVertex->graphNodeName);
                 ptr2 = ptr2->right;
             }
             printf("\n");
@@ -466,7 +391,6 @@ graph *addVertex(graph *graphPtr, char nodeName)
     return graphPtr;
 
 }
-
 
 graph *deleteVertex(graph *graphPtr , char nodeName)
 {
@@ -543,6 +467,8 @@ graph *addEdge(graph *graphPtr, char startNodeName ,char endNodeName ,int weight
         newEdgeNode->graphNodeName = endNodeName;
         newEdgeNode->right = NULL;
         newEdgeNode->weight = weight;
+        newEdgeNode->startVertex = ptr1;
+        newEdgeNode->endVertex = ptr2;
 
         EdgeNode *cnPtr = ptr1->right;
         while(cnPtr->right != NULL)
@@ -610,40 +536,6 @@ graph *deleteEdge(graph *graphPtr, char startNodeName ,char endNodeName)
 
 }
 
-
-
-void displayDepthFirst(graph *graphPtr , char startPoint)
-{
-    VertexNode *vptr = graphPtr->VertexListRoot;
-
-    while(vptr->graphNodeName != startPoint  )
-    {
-        vptr = vptr->down;
-    }
-
-    if(vptr->mark == 1)
-    { 
-        return ;
-     
-    }
-    else
-    {
-        printf("\t [ %c ]\t",vptr->graphNodeName);
-        vptr->mark = 1;
-        EdgeNode *cnPtr =vptr->right;
-        while(cnPtr != NULL)
-        {
-            displayDepthFirst(graphPtr,cnPtr->graphNodeName);
-            cnPtr = cnPtr->right;
-        }
-
-    }
-     
-    
-
-}
-
-
 boolean isPathExists(graph *graphPtr ,char startNodeName, char endNodeName)
 {
     boolean retval =FALSE;
@@ -664,7 +556,7 @@ boolean isPathExists(graph *graphPtr ,char startNodeName, char endNodeName)
        
         vptr->mark = 1;
         EdgeNode *cnPtr =vptr->right;
-        while(cnPtr != NULL)
+        while(cnPtr != NULL && retval == FALSE)
         {
             retval = isPathExists(graphPtr,cnPtr->graphNodeName,endNodeName);
             cnPtr = cnPtr->right;
@@ -699,145 +591,9 @@ boolean isDisConnected(graph *graphPtr)
 
 }
 
+//************************************************************************************
 
 
-Queue *initializeQueue()
-{
-    Queue *qptr =(Queue *)malloc(sizeof(Queue));
-
-    for(int i=0;i<QueueSize;i++)
-    {
-        qptr->Arr[i] ='\0';
-    }
-
-    qptr->front = 0;
-    qptr->rear = -1;
-    qptr->isfull = FALSE;
-}
-
-status push(Queue *qptr,char ele)
-{
-    if(isFull(qptr))
-    {
-        printf("\n queue is  full \n");
-        return failure;
-    }
-    else
-    {
-       
-            qptr->rear = (qptr->rear +1)%QueueSize;
-            qptr->Arr[qptr->rear] = ele;
-            
-            if((qptr->rear + 1)%QueueSize == qptr->front)
-            {
-                qptr->isfull = TRUE; 
-            }
-
-       
-        
-
-    }
-    
-
-}
-
-char pop(Queue *qptr)
-{
-    char delchar = '\0';
-
-    if(isEmpty(qptr))
-    {
-        printf("\n queue is empty \n");
-        exit(1);
-    }
-    else
-    {
-        delchar = qptr->Arr[qptr->front] ;
-        qptr->Arr[qptr->front] = '\0';
-        qptr->front = (qptr->front +1)%QueueSize;
-       
-    }
-   
-   
-    return delchar;
-    
-
-}
-
-boolean isEmpty(Queue *qptr)
-{
-    if(qptr->front ==(qptr->rear +1)%QueueSize  && qptr->isfull == FALSE)
-    {
-        return TRUE;
-    }
-    else
-    {
-        return FALSE;
-    }
-    
-
-}
-
-boolean isFull(Queue *qptr)
-{
-   if(qptr->front ==(qptr->rear +1)%QueueSize  && qptr->isfull == TRUE)
-    {
-        return TRUE;
-    }
-    else
-    {
-        return FALSE;
-    }
-    
-}
-
-void printQueue(Queue *qptr)
-{ 
-    printf("queue status :");
-  for(int i=0;i<QueueSize;i++)
-  {
-      if(qptr->Arr[i] != '\0')
-      {
-         printf("[ %c ]",qptr->Arr[i]);
-      }
-        
-
-  }
-
-   
-
-}
 
 
-// {
-//     boolean retval =FALSE;
-//     AdjListNode *alPtr = graphPtr->AdjListPtr;
 
-//     while(alPtr->graphNodeName != startPoint  )
-//     {
-//         alPtr = alPtr->down;
-//     }
-
-//     if(alPtr->graphNodeName == endNodeName)
-//     { 
-//         retval = TRUE;
-     
-//     }
-//     else
-//     {
-//         if
-        
-//         alPtr->mark = 1;
-//         ConnectNode *cnPtr =alPtr->right;
-//         while(cnPtr != NULL)
-//         {
-//             retval = isPathExists(graphPtr,cnPtr->graphNodeName,endNodeName);
-//             cnPtr = cnPtr->right;
-//         }
-
-//     }
-
-//     return retval;
-
-
-// }

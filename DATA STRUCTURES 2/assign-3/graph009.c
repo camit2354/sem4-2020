@@ -76,6 +76,16 @@ boolean isAllFound(int no_of_vertex,int arr[no_of_vertex]);
 int selMin(int no_of_vertex,int found[],int dist[]);
 //****************************************************************
 
+//****************************************************************
+void apsp(int no_of_vertex,int grapharr[][no_of_vertex]);
+//****************************************************************
+graph *CreateMST(graph *);
+
+status BreadthFirstSearch(graph *,char ,char );
+status BreadthFirstAlgo(graph *gp,Queue *qptr,char endPoint);
+status DepthFirstSearch(graph *,char ,char );
+status DepthFirstAlgo(graph *,char ,char );
+
 boolean isPathExists(graph * ,char , char );
 boolean isDisConnected(graph *);
 
@@ -89,8 +99,40 @@ void markedNodes(graph *);
 
 void main()
 {
-     int Arr[5][5] ={{0,2,5,INF,3},{INF,0,6,4,10},{INF,INF,0,INF,2},{INF,INF,INF,0,INF},{INF,INF,1,2,0}};
-     dijkstra(5,Arr);
+      graph *graphPtr = initializeGraph();
+      simplyDisplay(graphPtr);
+      CreateMST(graphPtr);
+
+    //   graph *graphPtr = initializeGraph();
+    //   simplyDisplay(graphPtr);
+    //   DepthFirstSearch(graphPtr,'A','D');
+
+
+    //  graph *graphPtr = initializeGraph();
+    // simplyDisplay(graphPtr);
+    // BreadthFirstSearch(graphPtr,'C','A');
+
+    //  int Arr2[3][3] = {{0,4,11},{6,0,2},{3,INF,0}};
+    //  apsp(3,Arr2);
+
+    
+
+    //  int Arr[5][5] ={{0,2,5,INF,3},
+    //                 {INF,0,6,4,10},
+    //                 {INF,INF,0,INF,2},
+    //                 {INF,INF,INF,0,INF},
+    //                 {INF,INF,1,2,0}};
+
+    //  dijkstra(5,Arr);
+    //  printf("\n\n\n");
+    //  int Arr1[6][6] = {{0,50,45,20,INF,INF},
+    //                     {INF,0,10,15,INF,INF},
+    //                     {INF,INF,0,INF,30,INF},
+    //                     {10,INF,INF,0,15,INF},
+    //                     {INF,20,35,INF,0,INF},
+    //                     {INF,INF,INF,INF,23,0}};
+
+    //   dijkstra(6,Arr1);              
 
     // graph *graphPtr = initializeGraph();
     // simplyDisplay(graphPtr);
@@ -122,29 +164,260 @@ void main()
     // simplyDisplay(graphPtr);
 }
 
-void dijkstra(int no_of_vertex,int grapharr[][no_of_vertex])
+//**************minimum spanning tree :  Calculate and display  ********************
+graph *CreateMST(graph *gp)
 {
-    for(int i=0;i<no_of_vertex;i++)
-    {   printf(" %d : ",i); 
-        for(int j=0;j<no_of_vertex;j++)
-        {
-            printf(" [ %d ] ",grapharr[i][j]);
+    graph *gp1 = gp;
+    simplyDisplay(gp1);
+  
+}
+
+EdgeNode *LowestWeightEdge(graph *gp)
+{
+    EdgeNode *retedge = NULL;
+    VertexNode *vptr = gp->VertexListRoot;
+    EdgeNode *egptr = vptr->right;
+    retedge = egptr;
+    while(vptr != NULL)
+    {
+        egptr = vptr->right;
+        while(egptr != NULL)
+        {  if(retedge->weight > egptr->weight )
+           {
+             retedge = egptr;
+           }
+            egptr = egptr->right;
         }
-         printf("\n");
+        vptr = vptr->down;
     }
 
-    int found[no_of_vertex];
-    for(int i=0;i<no_of_vertex;i++)
+    return retedge;
+}
+//*************************************************************************************
+
+//*********************************************************************
+//******** search : breadth first  ********************************
+status BreadthFirstSearch(graph *gp,char startPoint,char endPoint )
+{   status isfound = failure;
+    Queue *qptr = initializeQueue();
+    push(qptr,startPoint);
+    markVertex(gp,startPoint);
+
+    isfound = BreadthFirstAlgo(gp,qptr,endPoint);
+
+    if(isfound)
     {
-        found[i] = 0;
+        printf("\n path %c -> %c exists\n",startPoint,endPoint);
+    }
+    else
+    {
+         printf("\n path %c -> %c does not exists\n",startPoint,endPoint);
+       
+    }
+    
+
+}
+
+status BreadthFirstAlgo(graph *gp,Queue *qptr,char endPoint)
+{
+    status retval = failure;
+     char printChar = pop(qptr);
+
+     if(printChar == endPoint)
+     {
+         retval = success;
+     }
+     else
+     {
+         if(printChar == '\0')
+         {
+             retval = failure;
+         }
+         else
+         {   // printf("[ %c ] ",printChar);
+             VertexNode *vptr = gp->VertexListRoot;
+
+               while(vptr->graphNodeName != printChar)
+               {
+                   vptr = vptr->down;
+               }
+
+                EdgeNode *egptr = vptr->right;
+                while(egptr != NULL)
+                {
+                    
+                        if(isMarked(gp,egptr->graphNodeName) == 0)
+                        {
+                            push(qptr,egptr->graphNodeName);
+                            markVertex(gp,egptr->graphNodeName);
+                        //  printf(" [ %c ] ",egptr->graphNodeName);
+
+                        }
+
+                        egptr =egptr->right;
+                    
+                }
+                
+                   // markVertex(graphPtr,printChar);
+                   // markedNodes(graphPtr);
+                   // printf("\n");
+                  // printQueue(qptr);
+                 retval = BreadthFirstAlgo(gp,qptr,endPoint);
+         }
+         
+     }
+ return retval;
+
+}
+
+//***********search : depth first *********************************
+status DepthFirstSearch(graph *gp,char startPoint,char endPoint )
+{
+        if(DepthFirstAlgo(gp,startPoint,endPoint))
+        {
+            printf("\n path exists :\n");
+        }
+        else
+        {
+            printf("\n path does not exists :\n");
+        }
+     
+}
+
+status DepthFirstAlgo(graph *gp,char startPoint,char endPoint )
+{
+    status retval = failure;
+     VertexNode *vptr = gp->VertexListRoot;
+
+        while(vptr->graphNodeName != startPoint  )
+        {
+            vptr = vptr->down;
+        }
+
+        if(vptr->mark == 0)
+        {
+            vptr->mark = 1;
+            if(vptr->graphNodeName == endPoint)
+            {
+                retval = success;
+            }
+            else
+            {
+                EdgeNode *cnPtr =vptr->right;
+                while(cnPtr != NULL && retval==failure)
+                {
+                    retval = DepthFirstAlgo(gp,cnPtr->graphNodeName,endPoint);
+                    cnPtr = cnPtr->right;
+                }
+                /* code */
+            }
+           
+        }
+        
+        
+        
+       return retval; 
+
+}
+//**********************************************************************
+
+
+
+//*************************************************************************
+//********** shortest path : [ APSP ] all pair shortest path alogoritm **************
+void apsp(int no_of_vertex,int grapharr[][no_of_vertex])
+{
+        int prev[no_of_vertex][no_of_vertex];
+
+        for(int i=0;i<no_of_vertex;i++)
+        {
+            for(int j=0;j<no_of_vertex;j++)
+            {
+                prev[i][j] = i;
+            }
+        }
+
+
+    for(int k=0;k<no_of_vertex;k++)
+    {
+        for(int i=0;i<no_of_vertex;i++)
+        {
+            for(int j=0;j<no_of_vertex;j++)
+            {
+                if(grapharr[i][k] + grapharr[k][j] < grapharr[i][j])
+                {
+                    grapharr[i][j] = grapharr[i][k] + grapharr[k][j] ;
+                    prev[i][j] = k;
+                }
+            }
+        }
+
+
+         for(int i=0;i<no_of_vertex;i++)
+        {
+            for(int j=0;j<no_of_vertex;j++)
+            {
+                printf("[ %d ]",grapharr[i][j]);
+            }
+            printf("\n");
+        }
+        printf("\n\n");
+
     }
 
-    int dist[no_of_vertex];
-    for(int i=0;i<no_of_vertex;i++)
-    {
-        dist[i] = grapharr[0][i];
-    }
-    found[0] = 1;
+       for(int i=0;i<no_of_vertex;i++)
+        {
+            for(int j=0;j<no_of_vertex;j++)
+            {
+                printf("\n reverse path [%d]->[%d]",i,j);
+                int m= i;
+                printf("[%d]",j);
+                while(prev[m][j] != j)
+                {
+                     printf("<-[%d]",prev[m][j]);
+                     m = prev[m][j];
+                    
+                }
+                printf("<-[%d]",i);
+                
+            }
+            printf("\n");
+        }
+        printf("\n\n");
+
+
+}
+
+//************************************************************************
+
+
+
+//**********************************************************************
+//****************** shortest path : dijkstras alogithm ****************
+
+void dijkstra(int no_of_vertex,int grapharr[][no_of_vertex])
+{      //initialization of prev array 
+        int prev[no_of_vertex];
+        for(int i=0;i<no_of_vertex;i++)
+        {
+            prev[i] = -1;
+        }
+   
+      // initialization of found array 
+        int found[no_of_vertex];
+        for(int i=0;i<no_of_vertex;i++)
+        {
+            found[i] = 0;
+        }
+
+     //initialization of dist array 
+        int dist[no_of_vertex];
+        for(int i=0;i<no_of_vertex;i++)
+        {
+            dist[i] = grapharr[0][i];
+            prev[i] = 0;
+        }
+        found[0] = 1;
 
     while(isAllFound(no_of_vertex,found) == FALSE)
     {
@@ -158,19 +431,37 @@ void dijkstra(int no_of_vertex,int grapharr[][no_of_vertex])
                 if(dist[minindex] + grapharr[minindex][i]<dist[i])
                 {
                     dist[i] = dist[minindex] + grapharr[minindex][i];
+                    prev[i] = minindex;
                 }
             }
         }
 
-         printf("\n found index : %d  \n dist array :",minindex);
-         for(int i=0;i<no_of_vertex;i++)
-         {
-           printf("[ %d ]",dist[i]);
-         }
-         printf("\n");
+        //  printf("\n found index : %d  \n dist array :",minindex);
+        //  for(int i=0;i<no_of_vertex;i++)
+        //  {
+        //    printf("[ %d ]",dist[i]);
+        //  }
+        //  printf("\n");
    
 
     }
+
+    printf("\n shortest paths : ");
+    for(int i=1;i<no_of_vertex;i++)
+    {    printf("\n path : [A]->[%C] length : %d ",'A'+i,dist[i]);
+         printf("reverse path : "); 
+         printf("[ %c ] ",'A'+i);
+         int j = i;
+           while(prev[j] != 0)
+            {
+                printf("<-[ %c ] ",'A'+prev[i]);
+                j = prev[j];
+                
+            }
+        printf("<-[ %c ] ",'A');
+       
+    }
+    printf("\n");
 
     
     
@@ -191,11 +482,11 @@ boolean isAllFound(int no_of_vertex,int arr[no_of_vertex])
 int selMin(int no_of_vertex,int found[],int dist[])
 {
     int minindex = -1;
-    int min = 1000;
+    int min = INF;
 
     for(int i=0;i<no_of_vertex;i++)
     {
-        if(dist[i] < min && found[i] == 0)
+        if(dist[i] <= min && found[i] == 0)
         {
             min = dist[i];
             minindex = i;
@@ -206,6 +497,13 @@ int selMin(int no_of_vertex,int found[],int dist[])
 
 
 }
+//***************************************************************
+
+
+
+//**************************************************************************
+//*********************** mark functions ***********************************
+
 void markedNodes(graph *gp)
 {
     VertexNode *vptr = gp->VertexListRoot;
@@ -222,6 +520,7 @@ void markedNodes(graph *gp)
             printf("\n\n");
 
 }
+
 void markVertex(graph *graphPtr,char ele )
 {
   VertexNode *vptr = graphPtr->VertexListRoot;
@@ -292,54 +591,12 @@ boolean isAllMarked(graph *graphPtr,char ele)
     return retval;
 
 }
-
-void displayBreadthFirst(graph *graphPtr , Queue *qptr)
-{
-    char printChar = pop(qptr);
-
-
-    if(printChar != '\0')
-    {
-        printf("[ %c ] ",printChar);
-             VertexNode *vptr = graphPtr->VertexListRoot;
-               while(vptr->graphNodeName != printChar)
-               {
-                   vptr = vptr->down;
-               }
-                    EdgeNode *egptr = vptr->right;
-                    while(egptr != NULL)
-                    {
-                       
-                          if(isMarked(graphPtr,egptr->graphNodeName) == 0)
-                          {
-                              push(qptr,egptr->graphNodeName);
-                              markVertex(graphPtr,egptr->graphNodeName);
-                            //  printf(" [ %c ] ",egptr->graphNodeName);
-
-                          }
-
-                          egptr =egptr->right;
-                        
-                    }
-                    
-                   // markVertex(graphPtr,printChar);
-                   // markedNodes(graphPtr);
-                   // printf("\n");
-                  // printQueue(qptr);
-                  displayBreadthFirst(graphPtr,qptr);
-     }
-     else
-     {
-         return ;
-     }
-     
-   
-   
-
-}
+//********************************************************************************
 
 
 
+//*******************************************************************************
+//************ graph standard functions ****************************************
 
 graph *initializeGraph()
 {
@@ -355,22 +612,29 @@ graph *initializeGraph()
     // scanf("%d",&N);
 
        simplyDisplay(graphPtr);
-    int Arr[5][5] ={{0,2,5,1000,3},{0,0,6,4,10},{0,0,0,0,2},{0,0,0,0,0},{0,0,1,2,0}};
-    for(int i=0;i<5;i++)
+   // int Arr[5][5] ={{0,2,5,1000,3},{0,0,6,4,10},{0,0,0,0,2},{0,0,0,0,0},{0,0,1,2,0}};
+    int Arr[7][7] = {{0,28,INF,INF,INF,10,INF},
+                        {28,0,16,INF,INF,INF,14},
+                        {INF,16,0,12,INF,INF,INF},
+                        {INF,INF,12,0,22,INF,18},
+                        {INF,INF,INF,22,0,25,24},
+                        {INF,INF,INF,INF,25,0,INF},
+                        {INF,14,INF,18,24,INF,0}};
+    for(int i=0;i<7;i++)
     {
         VertexNode *newVertexNode =(VertexNode *)malloc(sizeof(VertexNode));
-        newVertexNode->graphNodeName ='A' + i;
+        newVertexNode->graphNodeName ='0' + i;
         newVertexNode->mark = 0;
         newVertexNode->down = NULL;
         newVertexNode->right =NULL;
         
 
-        for(int j=0;j<5;j++)
+        for(int j=0;j<7;j++)
         {
             if(Arr[i][j] < 1000 && Arr[i][j] != 0)
             {
                 EdgeNode *newEdgeNode = (EdgeNode *)malloc(sizeof(EdgeNode));
-                newEdgeNode->graphNodeName = 'A' +j;
+                newEdgeNode->graphNodeName = '0' +j;
                 newEdgeNode->weight = Arr[i][j];
                 newEdgeNode->right =NULL;
                 newVertexNode->right = insertEdgeNode(newVertexNode->right,newEdgeNode);
@@ -383,7 +647,6 @@ graph *initializeGraph()
        
     }
 }
-
 
 VertexNode *insertVertexNode(VertexNode *root,VertexNode *newNode)
 {
@@ -466,7 +729,6 @@ graph *addVertex(graph *graphPtr, char nodeName)
     return graphPtr;
 
 }
-
 
 graph *deleteVertex(graph *graphPtr , char nodeName)
 {
@@ -610,40 +872,6 @@ graph *deleteEdge(graph *graphPtr, char startNodeName ,char endNodeName)
 
 }
 
-
-
-void displayDepthFirst(graph *graphPtr , char startPoint)
-{
-    VertexNode *vptr = graphPtr->VertexListRoot;
-
-    while(vptr->graphNodeName != startPoint  )
-    {
-        vptr = vptr->down;
-    }
-
-    if(vptr->mark == 1)
-    { 
-        return ;
-     
-    }
-    else
-    {
-        printf("\t [ %c ]\t",vptr->graphNodeName);
-        vptr->mark = 1;
-        EdgeNode *cnPtr =vptr->right;
-        while(cnPtr != NULL)
-        {
-            displayDepthFirst(graphPtr,cnPtr->graphNodeName);
-            cnPtr = cnPtr->right;
-        }
-
-    }
-     
-    
-
-}
-
-
 boolean isPathExists(graph *graphPtr ,char startNodeName, char endNodeName)
 {
     boolean retval =FALSE;
@@ -664,7 +892,7 @@ boolean isPathExists(graph *graphPtr ,char startNodeName, char endNodeName)
        
         vptr->mark = 1;
         EdgeNode *cnPtr =vptr->right;
-        while(cnPtr != NULL)
+        while(cnPtr != NULL && retval == FALSE)
         {
             retval = isPathExists(graphPtr,cnPtr->graphNodeName,endNodeName);
             cnPtr = cnPtr->right;
@@ -699,7 +927,56 @@ boolean isDisConnected(graph *graphPtr)
 
 }
 
+//************************************************************************************
 
+
+
+
+//************************************************************************
+// **************** display graph via : breadth first ********************************
+
+void displayBreadthFirst(graph *graphPtr , Queue *qptr)
+{
+    char printChar = pop(qptr);
+    if(printChar != '\0')
+    {
+        printf("[ %c ] ",printChar);
+             VertexNode *vptr = graphPtr->VertexListRoot;
+               while(vptr->graphNodeName != printChar)
+               {
+                   vptr = vptr->down;
+               }
+                    EdgeNode *egptr = vptr->right;
+                    while(egptr != NULL)
+                    {
+                       
+                          if(isMarked(graphPtr,egptr->graphNodeName) == 0)
+                          {
+                              push(qptr,egptr->graphNodeName);
+                              markVertex(graphPtr,egptr->graphNodeName);
+                            //  printf(" [ %c ] ",egptr->graphNodeName);
+
+                          }
+
+                          egptr =egptr->right;
+                        
+                    }
+                    
+                   // markVertex(graphPtr,printChar);
+                   // markedNodes(graphPtr);
+                   // printf("\n");
+                  // printQueue(qptr);
+                  displayBreadthFirst(graphPtr,qptr);
+     }
+     else
+     {
+         return ;
+     }
+     
+   
+   
+
+}
 
 Queue *initializeQueue()
 {
@@ -748,7 +1025,7 @@ char pop(Queue *qptr)
     if(isEmpty(qptr))
     {
         printf("\n queue is empty \n");
-        exit(1);
+        // exit(1);
     }
     else
     {
@@ -808,36 +1085,35 @@ void printQueue(Queue *qptr)
 
 }
 
+//**************************** display graph via : depth first  *********************************
+void displayDepthFirst(graph *graphPtr , char startPoint)
+{
+    VertexNode *vptr = graphPtr->VertexListRoot;
 
-// {
-//     boolean retval =FALSE;
-//     AdjListNode *alPtr = graphPtr->AdjListPtr;
+    while(vptr->graphNodeName != startPoint  )
+    {
+        vptr = vptr->down;
+    }
 
-//     while(alPtr->graphNodeName != startPoint  )
-//     {
-//         alPtr = alPtr->down;
-//     }
-
-//     if(alPtr->graphNodeName == endNodeName)
-//     { 
-//         retval = TRUE;
+    if(vptr->mark == 1)
+    { 
+        return ;
      
-//     }
-//     else
-//     {
-//         if
-        
-//         alPtr->mark = 1;
-//         ConnectNode *cnPtr =alPtr->right;
-//         while(cnPtr != NULL)
-//         {
-//             retval = isPathExists(graphPtr,cnPtr->graphNodeName,endNodeName);
-//             cnPtr = cnPtr->right;
-//         }
+    }
+    else
+    {
+        printf("\t [ %c ]\t",vptr->graphNodeName);
+        vptr->mark = 1;
+        EdgeNode *cnPtr =vptr->right;
+        while(cnPtr != NULL)
+        {
+            displayDepthFirst(graphPtr,cnPtr->graphNodeName);
+            cnPtr = cnPtr->right;
+        }
 
-//     }
+    }
+     
+    
 
-//     return retval;
-
-
-// }
+}
+//**********************************************************************************
